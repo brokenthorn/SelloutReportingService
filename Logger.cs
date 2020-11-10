@@ -16,14 +16,18 @@ namespace SelloutReportingService
         /// This instance logs to console and Windows Event Log if running under Windows.
         /// </remarks>
         public static readonly ILogger Instance = LoggerFactory
-            .Create(builder =>
+            .Create(configure =>
             {
-                builder
+                configure
                     .AddConsole(o => { o.TimestampFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK"; })
                     .AddConfiguration(Configuration.Instance);
 
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    builder.AddEventLog();
+                    configure.AddEventLog(settings =>
+                    {
+                        settings.LogName = "Application";
+                        settings.SourceName = "SelloutReportingService";
+                    });
             })
             .CreateLogger<ReportingServiceControl>();
     }
