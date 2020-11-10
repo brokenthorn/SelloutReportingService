@@ -1,0 +1,33 @@
+[
+  {
+    "JobId": "Example Job running every 1 minute",
+    "CronTrigger": "0 * * ? * * *",
+    "MsSqlConnectionString": "Server=localhost,1433;User Id=USENAME;Password=PASSWORD;Connection Timeout=10",
+    "SqlQuery": "EXEC DATABASE.dbo.SomeProcedureThatReturnsOneResultSet;",
+    "SqlCommandTimeout": 900,
+    "AlertEmailAddress": "YOU@YOURDOMAIN.COM",
+    "ReportFileFormat": "CSV",
+    "ReportFilePath": "OUTPUT_FILE_PATH.csv.zip",
+    "IsZipped": true,
+    "UploadDirectives": [
+      {
+        "Host": "FTP.YOURSITE.COM",
+        "Port": 21,
+        "IsSftp": false,
+        "PassiveMode": true,
+        "UseSsl": false,
+        "UserName": "FTP_USERNAME",
+        "Password": "FTP_PASSWORD",
+        "FolderPath": "/in/"
+      },
+      {
+        "Host": "SFTP.YOURSITE.COM",
+        "Port": 22,
+        "IsSftp": true,
+        "UserName": "SFTP_USERNAME",
+        "Password": "SFTP_PASSWORD",
+        "FolderPath": "/in/"
+      }
+    ]
+  }
+]
