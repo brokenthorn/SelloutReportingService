@@ -22,12 +22,21 @@ namespace SelloutReportingService
                     .AddConsole(o => { o.TimestampFormat = "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'fffffffK"; })
                     .AddConfiguration(Configuration.Instance);
 
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                    configure.AddEventLog(settings =>
-                    {
-                        settings.LogName = "Application";
-                        settings.SourceName = "SelloutReportingService";
-                    });
+                if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) return;
+                
+                const string logName = "Application";
+                const string sourceName = "SelloutReportingService";
+                    
+                if (!System.Diagnostics.EventLog.SourceExists(sourceName))
+                {
+                    System.Diagnostics.EventLog.CreateEventSource(sourceName, logName);
+                }
+                    
+                configure.AddEventLog(settings =>
+                {
+                    settings.LogName = logName;
+                    settings.SourceName = sourceName;
+                });
             })
             .CreateLogger<ReportingServiceControl>();
     }
