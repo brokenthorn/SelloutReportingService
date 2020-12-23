@@ -2,8 +2,6 @@ name: Publish on push of v* tags on main branch
 
 on:
   push:
-    branches:
-      - main
     tags:
       - v*
   workflow_dispatch:
@@ -34,12 +32,15 @@ jobs:
     - name: Build and Pack files
       shell: bash
       run: |
+        pwd
+        env
+        
         # Define some variables for things we need
         tag=$(git describe --tags --abbrev=0)
         release_name="SelloutReportingService-$tag-${{ matrix.target }}"
         
         # Build everything
-        dotnet publish "$GITHUB_WORKSPACE/SelloutReportingService/SelloutReportingService.csproj" --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "./$release_name"
+        dotnet publish "./SelloutReportingService" --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "./$release_name"
         
         # Pack files
         if [ "${{ matrix.target }}" == "win-x64" ]; then
