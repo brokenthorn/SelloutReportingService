@@ -1,3 +1,5 @@
+![Publish Release](https://github.com/brokenthorn/SelloutReportingService/workflows/Publish/badge.svg)
+
 # SelloutReportingService
 A Windows service that generates and sends custom reports using SQL Server and Cron Trigger expressions for scheduling.
 
