@@ -36,7 +36,7 @@ jobs:
             tar czvf "${release_name}.tar.gz" "release/${release_name}"
         fi
         
-        rm -r "$release_name"
+        rm -r "release/$release_name"
         
     - name: Publish
       uses: softprops/action-gh-release@v1
