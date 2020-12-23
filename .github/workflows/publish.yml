@@ -1,13 +1,16 @@
-name: Publish on release
+name: Publish on push of v* tags on main branch
 
 on:
-  release:
-    types: [published]
+  push:
+    branches:
+      - main
+    tags:
+      - v*
+  workflow_dispatch:
 
 jobs:
   release:
     name: Release
-    
     strategy:
       matrix:
         kind: ['windows']
@@ -15,24 +18,20 @@ jobs:
           - kind: windows
             os: windows-latest
             target: win-x64
-
     runs-on: ${{ matrix.os }}
 
     steps:
     - name: Checkout
       uses: actions/checkout@v2
       with:
-        fetch-depth: 0
+        ref: ${{ github.ref }}
 
     - name: Setup dotnet
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 3.1.101
-
-    - name: Restore dependencies
-      run: dotnet restore
     
-    - name: Build
+    - name: Build and Pack files
       shell: bash
       run: |
         # Define some variables for things we need
@@ -40,17 +39,17 @@ jobs:
         release_name="SelloutReportingService-$tag-${{ matrix.target }}"
         
         # Build everything
-        dotnet publish --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "$release_name"
+        dotnet publish "$GITHUB_WORKSPACE/SelloutReportingService/SelloutReportingService.csproj" --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "./$release_name"
         
         # Pack files
         if [ "${{ matrix.target }}" == "win-x64" ]; then
-          7z a -tzip "${release_name}.zip" "./${release_name}/*"
+          7z a -tzip "${release_name}.zip" "./$release_name"
         else
-            tar czvf "${release_name}.tar.gz" "$release_name"
+            tar czvf "${release_name}.tar.gz" "./$release_name"
         fi
         
         # Delete output directory
-        rm -r "$release_name"
+        rm -r "./$release_name"
         
     - name: Publish
       uses: softprops/action-gh-release@v1
