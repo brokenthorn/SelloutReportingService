@@ -19,11 +19,6 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
-#     - name: Setup dotnet
-#       uses: actions/setup-dotnet@v1
-#       with:
-#         dotnet-version: 3.x
-        
     - name: Checkout
       uses: actions/checkout@v2
     
@@ -33,12 +28,12 @@ jobs:
         tag=$(git describe --tags --abbrev=0)
         release_name="SelloutReportingService-$tag-${{ matrix.target }}"
         
-        dotnet publish --runtime "${{ matrix.target }}" -c Release -o "${release_name}"
+        dotnet publish --runtime "${{ matrix.target }}" -c Release -o "release/${release_name}"
         
         if [ "${{ matrix.target }}" == "win-x64" ]; then
-          7z a -tzip "${release_name}.zip" "${release_name}"
+          7z a -tzip "${release_name}.zip" "release/${release_name}"
         else
-            tar czvf "${release_name}.tar.gz" "${release_name}"
+            tar czvf "${release_name}.tar.gz" "release/${release_name}"
         fi
         
         rm -r "$release_name"
@@ -46,6 +41,8 @@ jobs:
     - name: Publish
       uses: softprops/action-gh-release@v1
       with:
-        files: "SelloutReportingService*"
+        files: |
+          SelloutReportingService*.zip
+          SelloutReportingService*.tar.gz
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
