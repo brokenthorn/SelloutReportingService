@@ -1,4 +1,4 @@
-name: Publish on push of v* tags on main branch
+name: Publish
 
 on:
   push:
@@ -19,38 +19,29 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     steps:
+#     - name: Setup dotnet
+#       uses: actions/setup-dotnet@v1
+#       with:
+#         dotnet-version: 3.x
+        
     - name: Checkout
       uses: actions/checkout@v2
-      with:
-        ref: ${{ github.ref }}
-
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.101
     
-    - name: Build and Pack files
+    - name: Build and pack
       shell: bash
       run: |
-        pwd
-        env
-        
-        # Define some variables for things we need
         tag=$(git describe --tags --abbrev=0)
         release_name="SelloutReportingService-$tag-${{ matrix.target }}"
         
-        # Build everything
-        dotnet publish "./SelloutReportingService" --framework netcoreapp3.1 --runtime "${{ matrix.target }}" -c Release -o "./$release_name"
+        dotnet publish --framework net5.0 --runtime "${{ matrix.target }}" -c Release -o "${release_name}"
         
-        # Pack files
         if [ "${{ matrix.target }}" == "win-x64" ]; then
-          7z a -tzip "${release_name}.zip" "./$release_name"
+          7z a -tzip "${release_name}.zip" "${release_name}"
         else
-            tar czvf "${release_name}.tar.gz" "./$release_name"
+            tar czvf "${release_name}.tar.gz" "${release_name}"
         fi
         
-        # Delete output directory
-        rm -r "./$release_name"
+        rm -r "$release_name"
         
     - name: Publish
       uses: softprops/action-gh-release@v1
